@@ -6,8 +6,7 @@ public class CoffeeMenu {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
         int choice;
-        int[] quantities = new int[5]; // to store quantities for each item (including index 0 for finishing order)
-
+        int[] quantities = new int[5];
 
         do {
             System.out.println("--- Coffee Menu ---");
@@ -18,10 +17,8 @@ public class CoffeeMenu {
             System.out.println("0. Finish order");
             System.out.print("Choose your coffee (1-4, or 0 to finish): ");
 
-
             try {
                 choice = Integer.parseInt(input.nextLine());
-
 
                 if (choice >= 1 && choice <= 4) {
                     System.out.print("Enter quantity: ");
@@ -36,18 +33,15 @@ public class CoffeeMenu {
             }
         } while (choice != 0);
 
-
         saveReceiptToFile(quantities);
         input.close();
     }
-
 
     public static void saveReceiptToFile(int[] quantities) {
         double[] prices = {0.0, 50.0, 70.0, 65.0, 80.0};
         String[] names = {"", "Espresso", "Latte", "Cappuccino", "Mocha"};
         double subtotal = 0.0;
         StringBuilder receipt = new StringBuilder();
-
 
         receipt.append("\n--- Coffee Order Receipt ---\n");
         for (int i = 1; i < quantities.length; i++) {
@@ -60,13 +54,11 @@ public class CoffeeMenu {
         double vat = subtotal * 0.12;
         double grandTotal = subtotal + vat;
 
-
         receipt.append("---------------------\n");
         receipt.append(String.format("Subtotal: %.2f PHP\n", subtotal));
         receipt.append(String.format("VAT (12%%): %.2f PHP\n", vat));
         receipt.append(String.format("Grand Total: %.2f PHP\n", grandTotal));
         receipt.append("---------------------\n");
-
 
         try (FileWriter writer = new FileWriter("coffeeReceipt.txt")) {
             writer.write(receipt.toString());
@@ -76,7 +68,6 @@ public class CoffeeMenu {
             e.printStackTrace();
         }
 
-
-        System.out.print(receipt.toString()); // Also print the receipt to the console
+        System.out.print(receipt.toString());
     }
 }
