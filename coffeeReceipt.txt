@@ -1,8 +1,7 @@
-
---- Coffee Order Receipt ---
-10 x Cappuccino @ 65.00 each = 650.00 PHP
----------------------
-Subtotal: 650.00 PHP
-VAT (12%): 78.00 PHP
-Grand Total: 728.00 PHP
----------------------
+~~~~ Receipt ~~~~~~~~~
+7 x Mocha @ 80.00 each = 560.00
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Total before VAT: 560.00
+VAT (12%): 67.20
+Total amount due: 627.20
+------------------------------

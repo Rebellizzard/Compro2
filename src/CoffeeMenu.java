@@ -2,72 +2,102 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
+/** This program will display the coffee menu
+ * the price valute of the menu and
+ * display the ordered product valuye in beforeVAT, VAT, totalAmountDue
+ * and finally save the file to CoffeeReceipt.txt
+ */
 public class CoffeeMenu {
+
+    static String[] coffeeTypes = {"Espresso", "Latte", "Cappuccino", "Mocha"};
+    static double[] coffeePrices = {50.0, 70.0, 65.0, 80.0};
+
     public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
-        int choice;
-        int[] quantities = new int[5];
+        Scanner scanner = new Scanner(System.in);
 
-        do {
-            System.out.println("--- Coffee Menu ---");
-            System.out.println("1. Espresso - 50.0 PHP");
-            System.out.println("2. Latte - 70.0 PHP");
-            System.out.println("3. Cappuccino - 65.0 PHP");
-            System.out.println("4. Mocha - 80.0 PHP");
-            System.out.println("0. Finish order");
-            System.out.print("Choose your coffee (1-4, or 0 to finish): ");
+        String menu = String.format("""
+                ~ Coffee Menu ~
+                1. Espresso - 50.0 PHP
+                2. Latte - 70.0 PHP
+                3. Cappuccino - 65.0 PHP
+                4. Mocha - 80.0 PHP
+                0. Complete Order
+                Please select a coffee (1-4) or 0 to finish:
+                """);
 
-            try {
-                choice = Integer.parseInt(input.nextLine());
+        int[] orderedQuantities = new int[coffeeTypes.length];
 
-                if (choice >= 1 && choice <= 4) {
-                    System.out.print("Enter quantity: ");
-                    int quantity = Integer.parseInt(input.nextLine());
-                    quantities[choice] += quantity;
-                } else if (choice != 0) {
-                    System.out.println("Invalid choice, please try again.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid choice, please try again.");
-                choice = -1; // continue the loop
+        while (true) {
+            System.out.print(menu);
+            int choice = scanner.nextInt();
+
+            if (choice == 0) {
+                break;
+            } else if (choice < 1 || choice > coffeeTypes.length) {
+                System.out.println("Invalid selection. Please choose a valid coffee type.");
+                continue;
             }
-        } while (choice != 0);
 
-        saveReceiptToFile(quantities);
-        input.close();
+            System.out.print("Enter the quantity: ");
+            int quantity = scanner.nextInt();
+
+            if (quantity <= 0) {
+                System.out.println("Quantity must be a positive number. Try again.");
+                continue;
+            }
+            orderedQuantities[choice - 1] += quantity;
+        }
+
+        double totalAmount = calculateTotalAmount(orderedQuantities);
+        double vatAmount = totalAmount * 0.12;
+        double finalTotal = totalAmount + vatAmount;
+        printReceipt(coffeeTypes, coffeePrices, orderedQuantities);
+
+        System.out.printf("Total before VAT: %.2f\n", totalAmount);
+        System.out.printf("VAT (12%%): %.2f\n", vatAmount);
+        System.out.printf("Total amount due: %.2f\n", finalTotal);
+        System.out.println("------------------------------");
+
+        saveReceiptToFile(orderedQuantities, totalAmount, vatAmount, finalTotal);
+
+        System.out.println("Receipt has been saved to CoffeeReceipt.txt.");
     }
 
-    public static void saveReceiptToFile(int[] quantities) {
-        double[] prices = {0.0, 50.0, 70.0, 65.0, 80.0};
-        String[] names = {"", "Espresso", "Latte", "Cappuccino", "Mocha"};
-        double subtotal = 0.0;
-        StringBuilder receipt = new StringBuilder();
+    public static double calculateTotalAmount(int[] quantities) {
+        double total = 0;
+        for (int i = 0; i < coffeeTypes.length; i++) {
+            total += quantities[i] * coffeePrices[i];
+        }
+        return total;
+    }
 
-        receipt.append("\n--- Coffee Order Receipt ---\n");
-        for (int i = 1; i < quantities.length; i++) {
+    public static void printReceipt(String[] names, double[] prices, int[] quantities) {
+        String header = "~~~~ Receipt ~~~~";
+        String separator = "~~~~~~~~~~~~~~~~~~~~~~";
+        System.out.println(header);
+        for (int i = 0; i < coffeeTypes.length; i++) {
             if (quantities[i] > 0) {
-                double itemTotal = quantities[i] * prices[i];
-                receipt.append(String.format("%d x %s @ %.2f each = %.2f PHP\n", quantities[i], names[i], prices[i], itemTotal));
-                subtotal += itemTotal;
+                System.out.printf("%d x %s @ %.2f each = %.2f\n", quantities[i], names[i], prices[i], quantities[i] * prices[i]);
             }
         }
-        double vat = subtotal * 0.12;
-        double grandTotal = subtotal + vat;
+        System.out.println(separator);
+    }
 
-        receipt.append("---------------------\n");
-        receipt.append(String.format("Subtotal: %.2f PHP\n", subtotal));
-        receipt.append(String.format("VAT (12%%): %.2f PHP\n", vat));
-        receipt.append(String.format("Grand Total: %.2f PHP\n", grandTotal));
-        receipt.append("---------------------\n");
-
-        try (FileWriter writer = new FileWriter("coffeeReceipt.txt")) {
-            writer.write(receipt.toString());
-            System.out.println("Receipt saved to coffeeReceipt.txt");
+    public static void saveReceiptToFile(int[] quantities, double totalAmount, double vatAmount, double finalTotal) {
+        try (FileWriter fileWriter = new FileWriter("CoffeeReceipt.txt")) {
+            fileWriter.write("~~~~ Receipt ~~~~~~~~~\n");
+            for (int i = 0; i < coffeeTypes.length; i++) {
+                if (quantities[i] > 0) {
+                    fileWriter.write(String.format("%d x %s @ %.2f each = %.2f\n", quantities[i], coffeeTypes[i], coffeePrices[i], quantities[i] * coffeePrices[i]));
+                }
+            }
+            fileWriter.write("~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+            fileWriter.write(String.format("Total before VAT: %.2f\n", totalAmount));
+            fileWriter.write(String.format("VAT (12%%): %.2f\n", vatAmount));
+            fileWriter.write(String.format("Total amount due: %.2f\n", finalTotal));
+            fileWriter.write("------------------------------\n");
         } catch (IOException e) {
-            System.out.println("An error occurred while saving the receipt.");
-            e.printStackTrace();
+            System.out.println("Error saving receipt: " + e.getMessage());
         }
-
-        System.out.print(receipt.toString());
     }
 }
