@@ -13,7 +13,7 @@ public class CoffeeMenu {
     static double[] coffeePrices = {50.0, 70.0, 65.0, 80.0};
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        Scanner mk = new Scanner(System.in);
 
         String menu = String.format("""
                 ~ Coffee Menu ~
@@ -29,7 +29,7 @@ public class CoffeeMenu {
 
         while (true) {
             System.out.print(menu);
-            int choice = scanner.nextInt();
+            int choice = mk.nextInt();
 
             if (choice == 0) {
                 break;
@@ -39,7 +39,7 @@ public class CoffeeMenu {
             }
 
             System.out.print("Enter the quantity: ");
-            int quantity = scanner.nextInt();
+            int quantity = mk.nextInt();
 
             if (quantity <= 0) {
                 System.out.println("Quantity must be a positive number. Try again.");
